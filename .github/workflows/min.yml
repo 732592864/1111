@@ -9,7 +9,7 @@ env:
   # Optional, defaults to main
   UPSTREAM_BRANCH: "main"
   # Optional, defaults to UPSTREAM_BRANCH
-  DOWNSTREAM_BRANCH: ""
+  DOWNSTREAM_BRANCH: "https://github.com/732592864/1111"
   # Optional merge arguments
   MERGE_ARGS: "keyboard_shortcuts.txt"
   # Optional push arguments
