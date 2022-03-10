@@ -1,31 +1,37 @@
-# File: .github/workflows/iplcdn_repo-sync.yml
-name: sync-scripts
+name: Sync Upstream
+
+env:
+  # Required, URL to upstream (fork base)
+  UPSTREAM_URL: "https://github.com/Isayso/PlaylistEditorTV.git"
+  # Required, token to authenticate bot, could use ${{ secrets.GITHUB_TOKEN }} 
+  # Over here, we use a PAT instead to authenticate workflow file changes.
+  WORKFLOW_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+  # Optional, defaults to main
+  UPSTREAM_BRANCH: "main"
+  # Optional, defaults to UPSTREAM_BRANCH
+  DOWNSTREAM_BRANCH: ""
+  # Optional merge arguments
+  MERGE_ARGS: "keyboard_shortcuts.txt"
+  # Optional push arguments
+  PUSH_ARGS: ""
+
+# This runs every day on 1801 UTC
 on:
   schedule:
-    - cron: '5 0,7,15 * * *'
+    - cron: '1 18 * * *'
+  # Allows manual workflow run (must in default branch to work)
   workflow_dispatch:
-  watch:
-    types: started
-  repository_dispatch:
-    types: sync-iplcdn-scripts
-jobs:
-  repo-sync:
-    env:
-      PAT: ${{ secrets.PAT || github.event.client_payload.PAT }} 
-      #此处PAT需要申请，教程详见：https://www.jianshu.com/p/bb82b3ad1d11
-      #https://github.com/iplcdn/auto_repo-sync/blob/master/reposync.md
-    runs-on: ubuntu-latest
-    if: github.event.repository.owner.id == github.event.sender.id
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          persist-credentials: false
 
-      - name: sync iplcdn-scripts
-        uses: repo-sync/github-sync@v2
-        if: env.PAT
-        with:
-          git clone: "https://raw.githubusercontent.com/Isayso/PlaylistEditorTV/master/bitcoin/bitcoin-redirect.html"
-          source_branch: "master"
-          destination_branch: "main1111/111/"
-          github_token: ${{ secrets.PAT || github.event.client_payload.PAT }}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: GitHub Sync to Upstream Repository
+        uses: dabreadman/sync-upstream-repo@v1.1.0.b
+        with: 
+          upstream_repo: ${{ env.UPSTREAM_URL }}
+          upstream_branch: ${{ env.UPSTREAM_BRANCH }}
+          downstream_branch: ${{ env.DOWNSTREAM_BRANCH }}
+          token: ${{ env.WORKFLOW_TOKEN }}
+          merge_args: ${{ env.MERGE_ARGS }}
+          push_args: ${{ env.PUSH_ARGS }}
